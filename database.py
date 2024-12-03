@@ -12,7 +12,10 @@ class Database:
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS portfolio (
                     Ticker TEXT PRIMARY KEY,
+                    Shares REAL,
                     Stock_Price REAL,
+                    Market_Value REAL,
+                    Profit_Loss REAL,
                     Percent_of_Portfolio REAL,
                     Analyst_Rating TEXT,
                     Price_Target REAL
@@ -24,8 +27,8 @@ class Database:
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             cursor.executemany("""
-                INSERT OR REPLACE INTO portfolio (Ticker, Stock_Price, Percent_of_Portfolio, Analyst_Rating, Price_Target)
-                VALUES (?, ?, ?, ?, ?)
+                INSERT OR REPLACE INTO portfolio (Ticker, Shares, Stock_Price, Market_Value, Profit_Loss, Percent_of_Portfolio, Analyst_Rating, Price_Target)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """, data)
             conn.commit()
 

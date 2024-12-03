@@ -1,5 +1,6 @@
 __pycache__/
 Schwab/
+venv/
 Streamlit
 *.env
 tokens.json
