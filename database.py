@@ -18,7 +18,8 @@ class Database:
                     Profit_Loss REAL,
                     Percent_of_Portfolio REAL,
                     Analyst_Rating TEXT,
-                    Price_Target REAL
+                    Price_Target REAL,
+                    Sector TEXT
                 )
             """)
             conn.commit()
@@ -27,9 +28,26 @@ class Database:
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             cursor.executemany("""
-                INSERT OR REPLACE INTO portfolio (Ticker, Shares, Stock_Price, Market_Value, Profit_Loss, Percent_of_Portfolio, Analyst_Rating, Price_Target)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT OR REPLACE INTO portfolio (Ticker, Shares, Stock_Price, Market_Value, Profit_Loss, Percent_of_Portfolio, Analyst_Rating, Price_Target, Sector)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, data)
+            conn.commit()
+
+
+    def remove_missing_positions(self, current_tickers):
+        """
+        Remove positions from the database that are not in the current list of tickers.
+        :param current_tickers: List of tickers fetched from the latest API call.
+        """
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            # Create a placeholder string for the query, e.g., (?, ?, ?)
+            placeholders = ', '.join('?' for _ in current_tickers)
+            query = f"""
+                DELETE FROM portfolio
+                WHERE Ticker NOT IN ({placeholders})
+            """
+            cursor.execute(query, current_tickers)
             conn.commit()
 
     def calculate_and_update_percent_portfolio(self, holdings):
@@ -54,11 +72,29 @@ class Database:
                         WHERE Ticker = ?
                     """, (percent_portfolio, ticker))
             conn.commit()
+    
+    def get_portfolio_weights(self):
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT Ticker, Percent_of_Portfolio FROM portfolio")
+            return cursor.fetchall()
 
     def fetch_all_data(self):
         with sqlite3.connect(self.db_path) as conn:
             df = pd.read_sql_query("SELECT * FROM portfolio", conn)
         return df
+
+    def get_price_target(self, ticker):
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT Price_Target
+                FROM portfolio
+                WHERE Ticker = ?
+            """, (ticker,))
+            result = cursor.fetchone()
+            # If the ticker is found, return the price target; otherwise, return None
+            return result[0] if result else None
 
     def update_price_target(self, ticker, price_target):
         with sqlite3.connect(self.db_path) as conn:

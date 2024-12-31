@@ -18,6 +18,7 @@
             <th>% of Portfolio</th>
             <th>Analyst Rating</th>
             <th>Price Target</th>
+            <th>Sector</th>
         </tr>
     </thead>
     <tbody>
@@ -37,6 +38,7 @@
                     <button type="submit">Update</button>
                 </form>
             </td>
+            <td>{{ row.Sector }}</td>
         </tr>
         {% endfor %}
     </tbody>

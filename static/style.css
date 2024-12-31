@@ -1,5 +1,12 @@
 body {
     font-family: Arial, sans-serif;
+    background-color: rgba(33,33,33,.9);
+    color: #bdc1c6;
+}
+
+link, a {
+    color: #bdc1c6;
+    text-decoration: none;
 }
 
 table {
@@ -15,6 +22,88 @@ table th, table td {
 }
 
 table th {
+    color: rgba(33,33,33,.9);
     background-color: #f4f4f4;
     font-weight: bold;
+}
+
+ul {
+    list-style-type: none;
+}
+
+.sectors-container {
+    display: flex;
+    gap: 1px;
+}
+
+.all-sectors {
+    display: flex;
+    flex-direction: column;
+}
+
+.my-sectors {
+    display: flex;
+    flex-direction: column;
+    margin: 80px 0;
+}
+
+.sector-box {
+    display: flex;
+    flex-direction: column;
+    margin: 0 8px;
+    padding: 10px;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.sector-box.real-estate {
+    background-color: #ee82ee;
+}
+
+.sector-box.consumer-cyclical {
+    background-color: #e53935;
+}
+
+.sector-box.basic-materials {
+    background-color: #fdd835;
+}
+
+.sector-box.consumer-defensive {
+    background-color: #6d4c41;
+}
+
+.sector-box.technology {
+    background-color: #fb8c00;
+}
+
+.sector-box.communication-services {
+    background-color: #00ACC1;
+}
+
+.sector-box.financial-services {
+    background-color: #1e88e5;
+}
+
+.sector-box.utilities {
+    background-color: #d81b60;
+}
+
+.sector-box.industrials {
+    background-color: #546e7a;
+}
+
+.sector-box.energy {
+    background-color: #7cb342;
+}
+
+.sector-box.healthcare {
+    background-color: #8e24aa; /* Lime Green */
+}
+
+/* Default styling for sectors not explicitly defined */
+.sector-box.default {
+    background-color: #708090; /* Slate Gray */
 }
