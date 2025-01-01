@@ -18,7 +18,37 @@ db = Database()
 def dashboard():
     # Fetch all data from the database
     portfolio_data = db.fetch_all_data()
-    return render_template("dashboard.html", portfolio=portfolio_data)
+
+    sector_dictionary = {
+        'Technology': 'INFT',
+        'Financial Services': 'FINL',
+        'Communication Services': 'TELS',
+        'Industrials': 'INDU',
+        'Consumer Cyclical': 'COND',
+        'Consumer Defensive': 'CONS',
+        'Healthcare': 'HLTH',
+        'Utilities': 'UTIL',
+        'Real Estate': 'REAL',
+        'Energy': 'ENRS',
+        'Basic Materials': 'MATR',
+    }
+
+    # get sectors for legend at top
+    sectors = list(sector_dictionary.keys())
+
+    # Sort portfolio by sector
+    portfolio_data = portfolio_data.sort_values("Sector")
+
+    # Prepare data for rendering with sector-specific classes
+    portfolio_with_classes = [
+        {
+            "row": row,
+            "sector_class": row.Sector.replace(' ', '-').lower() if row.Sector else "default-sector",
+        }
+        for row in portfolio_data.itertuples()
+    ]
+
+    return render_template("dashboard.html", sectors=sectors, portfolio=portfolio_with_classes)
 
 @app.route('/sectors')
 def sector_breakdown():
@@ -34,7 +64,7 @@ def sector_breakdown():
 
     for ticker in positions_list:
         # Fetch sector weightings for the current ticker
-        sector_weightings = fetch_stock_data(ticker)[1]  # Assuming this returns a dictionary of sector weights
+        sector_weightings = fetch_stock_data(ticker)[1]  # returns a dictionary of sector weights
 
         # Get the portfolio weight for this ticker
         try:
@@ -53,17 +83,11 @@ def sector_breakdown():
             sector: (allocation / total_invested) * 100
             for sector, allocation in total_sector_allocation.items()
         }
-
-    # Print or return the total sector allocation
-    print("Sector Allocations:")
-    for sector, allocation in total_sector_allocation.items():
-        print(f"{sector}: {allocation:.2f}%")
             
     # Sort sectors by percentage in descending order
     sorted_sectors = dict(sorted(total_sector_allocation.items(), key=lambda item: item[1], reverse=True))
 
-    # Abbreviation mapping
-    abbreviations = {
+    sector_dictionary = {
         'Technology': 'INFT',
         'Financial Services': 'FINL',
         'Communication Services': 'TELS',
@@ -77,17 +101,12 @@ def sector_breakdown():
         'Basic Materials': 'MATR',
     }
 
+    # Abbreviation mapping
+    abbreviations = sector_dictionary # defined at bottom of this module
+
     sectors = list(sorted_sectors.keys())
     percentages = list(sorted_sectors.values())
 
-    # plt.figure(figsize=(10, 6))
-    # plt.barh(sectors, percentages, color='skyblue')
-    # plt.xlabel('Percentage of Portfolio')
-    # plt.ylabel('Sectors')
-    # plt.title('Portfolio Sector Allocation')
-    # plt.gca().invert_yaxis()
-    # plt.tight_layout()
-    # plt.savefig('static/sector_allocation.png')
     # Manually defined sector colors
     sector_colors = {
         "Real Estate": "#ee82ee",
@@ -103,7 +122,6 @@ def sector_breakdown():
         "Healthcare": "#8e24aa",
         "Unknown": "#708090",
     }
-
     # Create the Plotly bar chart
     fig = px.bar(
         x=percentages,
@@ -162,7 +180,12 @@ def refresh_data():
     for ticker in tickers:
         yahoo_dict = fetch_stock_data(ticker)[0] # gather info from yahoo api
         stock_price = yahoo_dict[ticker]['stock_price']
+        trailing_pe = yahoo_dict[ticker]['trailing_pe']
+        forward_pe = yahoo_dict[ticker]['forward_pe']
         analyst_rating = yahoo_dict[ticker]['analyst_rating']
+        if analyst_rating == "N/A" or analyst_rating == "none":
+            analyst_rating = '-'
+        analyst_price_target = yahoo_dict[ticker]['analyst_price_target']
         long_quantity = positions_dict[ticker]['long_quantity']
         market_value = positions_dict[ticker]['market_value']
         long_open_profit_loss = positions_dict[ticker]['long_profit_loss']
@@ -175,16 +198,44 @@ def refresh_data():
             print(f"Error calculating stock_price: {e}")
 
         # round my numbers
-        stock_price = round(stock_price, 1)
-        long_quantity = round(long_quantity, 1)
-        market_value = round(market_value, 1)
-        long_open_profit_loss = round(long_open_profit_loss, 1)
+
+        try:
+            stock_price = round(stock_price, 1)
+        except:
+            print(f'{stock_price} not a float')
+        try:
+            trailing_pe = round(trailing_pe, 1)
+        except:
+            # print(f'{trailing_pe} not a float')
+            trailing_pe = '-'
+        try:
+            forward_pe = round(forward_pe, 1)
+        except:
+            # print(f'{forward_pe} not a float')
+            forward_pe = '-'
+        try:
+            analyst_price_target = round(analyst_price_target, 1)
+        except:
+            # print(f'{analyst_price_target} not a float')
+            analyst_price_target = '-'
+        try:
+            long_quantity = round(long_quantity, 1)
+        except:
+            print(f'{long_quantity} not a float')
+        try:
+            market_value = round(market_value, 1)
+        except:
+            print(f'{market_value} not a float')
+        try:
+            long_open_profit_loss = round(long_open_profit_loss, 1)
+        except:
+            print(f'{long_open_profit_loss} not a float')
 
         price_target = db.get_price_target(ticker)
 
         sector = yahoo_dict[ticker]['sector']
 
-        stock_data.append((ticker, long_quantity, stock_price, market_value, long_open_profit_loss, None, analyst_rating, price_target, sector))
+        stock_data.append((ticker, long_quantity, stock_price, market_value, long_open_profit_loss, None, trailing_pe, forward_pe, analyst_rating, analyst_price_target, price_target, sector))
 
     # load up the database
     db.load_data_into_db(stock_data)

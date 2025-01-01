@@ -5,3 +5,10 @@ Probably need this for setup (all from same source)
     - Go to examples/api_demo.py 
     - See example return values in docs/api.md
 - https://www.youtube.com/watch?v=kHbom0KIJwc&t=681s
+
+
+to-do
+
+- add analyst price targets
+- add P/E ratio
+- add sector legend to top

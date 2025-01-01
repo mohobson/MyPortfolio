@@ -6,8 +6,17 @@ def fetch_stock_data(ticker):
     data = {}
     stock = yf.Ticker(ticker)
     info = stock.info
+    # for key, value in info.items():
+    #     print(key, value)
+    #     print('\n')
     price = info.get("currentPrice")
+    trailing_pe = info.get("trailingPE")
+    forward_pe = info.get("forwardPE")
     rating = info.get("recommendationKey", "N/A")
+    analyst_price_target = info.get("targetMeanPrice")
+
+    # print(analyst_price_target, trailing_pe, forward_pe)
+
     if "ETF" in info.get("quoteType", "") or "MUTUALFUND" in info.get("quoteType", ""):  # Check if it's an ETF or Mutual Fund
         # holdings = stock.get_funds_data(ticker).equity_holdings
         sector_weightings = {}
@@ -25,7 +34,7 @@ def fetch_stock_data(ticker):
     # print(sector)
 
 
-    data[ticker] = {'stock_price': price, 'analyst_rating': rating, 'sector': sector}
+    data[ticker] = {'stock_price': price, 'trailing_pe': trailing_pe, 'forward_pe': forward_pe, 'analyst_rating': rating, 'analyst_price_target': analyst_price_target, 'sector': sector}
     return data, sector_weightings
 
 # some tickers will require formatting for yahoo
@@ -59,3 +68,6 @@ def format_sector_name(sector):
     elif sector == 'healthcare':
         sector = 'Healthcare'
     return(sector)
+
+
+fetch_stock_data('SPY')

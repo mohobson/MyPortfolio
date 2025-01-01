@@ -6,3 +6,5 @@ Streamlit
 tokens.json
 *.pdf
 *.json
+delete.py
+*.db

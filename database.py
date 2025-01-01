@@ -17,7 +17,10 @@ class Database:
                     Market_Value REAL,
                     Profit_Loss REAL,
                     Percent_of_Portfolio REAL,
+                    Trailing_PE REAL,
+                    Forward_PE REAL,
                     Analyst_Rating TEXT,
+                    Analyst_Price_Target REAL,
                     Price_Target REAL,
                     Sector TEXT
                 )
@@ -28,8 +31,8 @@ class Database:
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             cursor.executemany("""
-                INSERT OR REPLACE INTO portfolio (Ticker, Shares, Stock_Price, Market_Value, Profit_Loss, Percent_of_Portfolio, Analyst_Rating, Price_Target, Sector)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT OR REPLACE INTO portfolio (Ticker, Shares, Stock_Price, Market_Value, Profit_Loss, Percent_of_Portfolio, Trailing_PE, Forward_PE, Analyst_Rating, Analyst_Price_Target, Price_Target, Sector)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, data)
             conn.commit()
 
