@@ -22,7 +22,8 @@ class Database:
                     Analyst_Rating TEXT,
                     Analyst_Price_Target REAL,
                     Price_Target REAL,
-                    Sector TEXT
+                    Sector TEXT,
+                    Notes TEXT
                 )
             """)
             conn.commit()
@@ -31,11 +32,10 @@ class Database:
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             cursor.executemany("""
-                INSERT OR REPLACE INTO portfolio (Ticker, Shares, Stock_Price, Market_Value, Profit_Loss, Percent_of_Portfolio, Trailing_PE, Forward_PE, Analyst_Rating, Analyst_Price_Target, Price_Target, Sector)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT OR REPLACE INTO portfolio (Ticker, Shares, Stock_Price, Market_Value, Profit_Loss, Percent_of_Portfolio, Trailing_PE, Forward_PE, Analyst_Rating, Analyst_Price_Target, Price_Target, Sector, Notes)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, data)
             conn.commit()
-
 
     def remove_missing_positions(self, current_tickers):
         """
@@ -107,4 +107,41 @@ class Database:
                 SET Price_Target = ?
                 WHERE Ticker = ?
             """, (price_target, ticker))
+            conn.commit()
+
+    def get_ticker_notes(self, ticker):
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT Notes
+                FROM portfolio
+                WHERE Ticker = ?
+            """, (ticker,))
+            result = cursor.fetchone()
+            # If the ticker is found, return the price target; otherwise, return None
+            return result[0] if result else None
+
+    def update_ticker_notes(self, ticker, ticker_notes):
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                UPDATE portfolio
+                SET Notes = ?
+                WHERE Ticker = ?
+            """, (ticker_notes, ticker))
+            conn.commit()
+
+    def delete_ticker_notes(self, ticker):
+        """
+        Deletes the note for a given ticker by setting its value to NULL.
+        :param ticker: The stock ticker for which the note will be deleted.
+        """
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            query = """
+                UPDATE portfolio
+                SET Notes = NULL
+                WHERE Ticker = ?
+            """
+            cursor.execute(query, (ticker,))
             conn.commit()

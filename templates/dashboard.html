@@ -35,6 +35,7 @@
                 <th>Analyst Rating</th>
                 <th>Analyst Price Target</th>
                 <th>Price Target</th>
+                <th>Notes</th>
             </tr>
         </thead>
         <tbody>
@@ -51,12 +52,32 @@
                 <td>{{ item.row.Analyst_Rating }}</td>
                 <td>${{ item.row.Analyst_Price_Target }}</td>
                 <td>
-                    <form action="{{ url_for('update_price_target') }}" method="POST">
-                        <input type="hidden" name="ticker" value="{{ item.row.Ticker }}">
-                        <input type="number" step="0.5" name="price_target" value="{{ item.row.Price_Target or 0 }}">
-                        <button type="submit">Update</button>
-                    </form>
+                    <!-- Price Target Display -->
+                    <div class="editable-field">
+                        <span class="static-value">${{ item.row.Price_Target or 0 }}</span>
+                        <button class="edit-button" onclick="toggleEditForm(this)">Edit</button>
+                        <form action="{{ url_for('update_price_target') }}" method="POST" class="edit-form hidden">
+                            <input type="hidden" name="ticker" value="{{ item.row.Ticker }}">
+                            <input type="number" step="0.5" name="price_target" value="{{ item.row.Price_Target or 0 }}" class="edit-input">
+                            <button type="submit" class="save-button">Save</button>
+                            <button type="button" class="cancel-button" onclick="cancelEdit(this)">Cancel</button>
+                        </form>
+                    </div>
                 </td>
+                <td class="notes">
+                    <!-- Notes Display -->
+                    <div class="editable-field">
+                        <span class="static-value">{{ item.row.Notes or "No notes available" }}</span>
+                        <button class="edit-button" onclick="toggleEditForm(this)">Edit</button>
+                        <form action="{{ url_for('update_ticker_notes') }}" method="POST" class="edit-form hidden">
+                            <input type="hidden" name="tick" value="{{ item.row.Ticker }}">
+                            <textarea name="ticker_notes" class="edit-textarea">{{ item.row.Notes or "" }}</textarea>
+                            <button type="submit" class="save-button">Save</button>
+                            <button type="button" class="cancel-button" onclick="cancelEdit(this)">Cancel</button>
+                        </form>
+                    </div>
+                </td>
+                             
             </tr>
             {% endfor %}
         </tbody>

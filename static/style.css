@@ -96,6 +96,102 @@ ul {
     list-style-type: none;
 }
 
+/*  */
+
+/* .expandable-textarea {
+    resize: none;
+    overflow: hidden;
+    width: 100%;
+    min-height: 20px;
+    line-height: 1.5;
+}
+
+.expandable-textarea:focus {
+    border-color: #f4f4f4;
+    outline: none;
+}
+
+.save-button {
+    margin-top: 5px;
+} */
+
+
+.notes {
+    max-width: 400px;
+}
+
+/* Editable Field Container */
+.editable-field {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Static Value Display */
+.static-value {
+    /* font-size: 14px;
+    color: #333; */
+    text-align: left;
+}
+
+/* Edit Form */
+.edit-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Hidden Class */
+.hidden {
+    display: none;
+}
+
+/* Input Fields and Textareas */
+.edit-input, .edit-textarea {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #333;
+}
+
+/* Buttons */
+.edit-button, .save-button, .cancel-button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.edit-button {
+    background-color: #bdc1c6;
+}
+
+.edit-button:hover {
+    background-color: #424242;
+}
+
+.save-button {
+    background-color: #28a745;
+}
+
+.save-button:hover {
+    background-color: #218838;
+}
+
+.cancel-button {
+    background-color: #dc3545;
+}
+
+.cancel-button:hover {
+    background-color: #c82333;
+}
+
+
+/*  */
+
 .sectors-container {
     display: flex;
     gap: 1px;

@@ -1,14 +1,17 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<h1>Sectors</h1>
+<h1>Sector Breakdown</h1>
 
-<a href="{{ url_for('dashboard') }}">Home</a>
+<div class="header-links">
+    <a class="header-links" href="{{ url_for('dashboard') }}">Home</a>
+</div>
+
 <iframe src="{{ url_for('static', filename='sector_allocation.html') }}" width="100%" height="600px" frameborder="0"></iframe>
 
 <div class="sectors-container">
     <div class="all-sectors">
-        <a href="https://novelinvestor.com/sector-performance/"><img decoding="async" src="https://149347908.v2.pressablecdn.com/wp-content/uploads/2024/10/novelinvestor-sector-returns-Q3-2024.png" alt="Novel Investor Sector Returns Quilt"/></a>
+        <a href="https://novelinvestor.com/sector-performance/"><img src="https://149347908.v2.pressablecdn.com/wp-content/uploads/2025/01/novelinvestor-sector-returns-FY-2024.png" alt="Novel Investor Sector Returns Quilt"/></a>
         <small>Source: <a href="https://novelinvestor.com/">novelinvestor.com</a></small>
     </div>
     <div class="my-sectors">

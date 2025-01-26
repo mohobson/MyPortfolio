@@ -130,10 +130,12 @@ def sector_breakdown():
         title="Portfolio Sector Allocation",
         labels={"x": "Percentage of Portfolio", "y": "Sector"},
         color=sectors,  # Set the color based on sectors
-        color_discrete_map=sector_colors  # Map sectors to manually defined colors
+        color_discrete_map=sector_colors,  # Map sectors to manually defined colors
+        text=[f"{p:.1f}%" for p in percentages]  # Add text labels
     )
 
     # Customize layout
+    fig.update_traces(textposition="auto") # auto-position labels
     fig.update_layout(
         title_font_size=20,
         xaxis=dict(title="Percentage of Portfolio", tickformat=".1f"),
@@ -158,13 +160,30 @@ def screener():
     portfolio_data = db.fetch_all_data()
     return render_template("screener.html", portfolio=portfolio_data)
 
-@app.route("/update", methods=["POST"])
+@app.route("/update_price_target", methods=["POST"])
 def update_price_target():
     # Update the price target for a specific ticker
     ticker = request.form.get("ticker")
     new_target = request.form.get("price_target")
     if ticker and new_target:
         db.update_price_target(ticker, float(new_target))
+    return redirect(url_for("dashboard"))
+
+@app.route("/update_notes", methods=["POST"])
+def update_ticker_notes():
+    # Update the ticker notes for a specific ticker
+    ticker = request.form.get("tick")
+    new_notes = request.form.get("ticker_notes")
+    print(new_notes, 0)
+    if ticker and new_notes:
+        print(new_notes)
+        db.update_ticker_notes(ticker, new_notes)
+    return redirect(url_for("dashboard"))
+
+@app.route("/delete_note", methods=["POST"])
+def delete_note():
+    ticker = request.form["tick"]
+    db.delete_ticker_notes(ticker)
     return redirect(url_for("dashboard"))
 
 @app.route("/refresh")
@@ -235,7 +254,9 @@ def refresh_data():
 
         sector = yahoo_dict[ticker]['sector']
 
-        stock_data.append((ticker, long_quantity, stock_price, market_value, long_open_profit_loss, None, trailing_pe, forward_pe, analyst_rating, analyst_price_target, price_target, sector))
+        ticker_notes = db.get_ticker_notes(ticker)
+
+        stock_data.append((ticker, long_quantity, stock_price, market_value, long_open_profit_loss, None, trailing_pe, forward_pe, analyst_rating, analyst_price_target, price_target, sector, ticker_notes))
 
     # load up the database
     db.load_data_into_db(stock_data)
