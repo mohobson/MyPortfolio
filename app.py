@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for
 from database import Database
+import create_charts
 from Yahoo.yfinance_fetch import fetch_stock_data
+from Yahoo.yfinance_fetch import get_one_year_daily_close_price
 from Schwab.api import schwab
 
 import pandas as pd
@@ -268,6 +270,23 @@ def refresh_data():
     db.calculate_and_update_percent_portfolio(holdings)
 
     return redirect(url_for("dashboard"))
+
+@app.route("/charts", methods=["GET", "POST"])
+def charts():
+    tickers = db.fetch_all_data()["Ticker"].tolist()
+    charts = []
+    
+    if request.method == "POST":
+        tickers = request.form["tickers"].upper().replace(" ", "").split(",")  # User input: "AAPL, TSLA, AMZN"
+    
+    for ticker in tickers:
+        df = get_one_year_daily_close_price(ticker)
+        df = create_charts.calculate_sma(df)
+        df = create_charts.generate_signals(df)
+        charts.append(create_charts.create_plot(df, ticker))  # Store multiple charts
+
+    return render_template("charts.html", charts=charts, tickers=", ".join(tickers))
+
 
 if __name__ == "__main__":
     app.run(debug=True)

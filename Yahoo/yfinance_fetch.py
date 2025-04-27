@@ -33,8 +33,12 @@ def fetch_stock_data(ticker):
         sector_weightings = {sector: 1.0}
     # print(sector)
 
-
-    data[ticker] = {'stock_price': price, 'trailing_pe': trailing_pe, 'forward_pe': forward_pe, 'analyst_rating': rating, 'analyst_price_target': analyst_price_target, 'sector': sector}
+    data[ticker] = {'stock_price': price,
+                    'trailing_pe': trailing_pe,
+                    'forward_pe': forward_pe,
+                    'analyst_rating': rating,
+                    'analyst_price_target': analyst_price_target,
+                    'sector': sector}
     return data, sector_weightings
 
 # some tickers will require formatting for yahoo
@@ -69,5 +73,10 @@ def format_sector_name(sector):
         sector = 'Healthcare'
     return(sector)
 
+def get_one_year_daily_close_price(ticker, period="1y"):
+    """Fetch stock data from Yahoo Finance."""
+    stock = yf.Ticker(ticker)
+    df = stock.history(period=period)
+    return df[['Close']]
 
-fetch_stock_data('SPY')
+# fetch_stock_data('SPY')
