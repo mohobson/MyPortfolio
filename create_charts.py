@@ -11,40 +11,38 @@ def calculate_sma(df, short_window=50, long_window=200):
     return df
 
 def generate_signals(df, ticker):
-    signals = []
-
     # Make sure the dataframe has no missing values
     df = df.dropna()
 
-    # Get the last two rows to detect crossovers
-    prev = df.iloc[-2]
-    curr = df.iloc[-1]
+    # Create new columns initialized to False
+    df["Buy Signal"] = False
+    df["Sell Signal"] = False
 
-    # SMA50 crosses above SMA200 (Golden Cross) - BUY
-    if prev['SMA50'] < prev['SMA200'] and curr['SMA50'] > curr['SMA200']:
-        signals.append({'ticker': ticker, 'signal': 'BUY', 'desc': 'SMA50 crossed above SMA200'})
+    # Check for crossover events
+    for i in range(1, len(df)):
+        prev = df.iloc[i-1]
+        curr = df.iloc[i]
 
-    # SMA50 crosses below SMA200 (Death Cross) - SELL
-    if prev['SMA50'] > prev['SMA200'] and curr['SMA50'] < curr['SMA200']:
-        signals.append({'ticker': ticker, 'signal': 'SELL', 'desc': 'SMA50 crossed below SMA200'})
+        # SMA50 crosses above SMA200 => Buy
+        if prev["SMA50"] < prev["SMA200"] and curr["SMA50"] > curr["SMA200"]:
+            df.at[df.index[i], "Buy Signal"] = True
 
-    # Price crosses above SMA50 - BUY
-    if prev['Close'] < prev['SMA50'] and curr['Close'] > curr['SMA50']:
-        signals.append({'ticker': ticker, 'signal': 'BUY', 'desc': 'Price crossed above SMA50'})
+        # Price crosses above SMA50 or SMA200 => Buy
+        if (prev["Close"] < prev["SMA50"] and curr["Close"] > curr["SMA50"]) or \
+           (prev["Close"] < prev["SMA200"] and curr["Close"] > curr["SMA200"]):
+            df.at[df.index[i], "Buy Signal"] = True
 
-    # Price crosses below SMA50 - SELL
-    if prev['Close'] > prev['SMA50'] and curr['Close'] < curr['SMA50']:
-        signals.append({'ticker': ticker, 'signal': 'SELL', 'desc': 'Price crossed below SMA50'})
+        # SMA50 crosses below SMA200 => Sell
+        if prev["SMA50"] > prev["SMA200"] and curr["SMA50"] < curr["SMA200"]:
+            df.at[df.index[i], "Sell Signal"] = True
 
-    # Price crosses above SMA200 - BUY
-    if prev['Close'] < prev['SMA200'] and curr['Close'] > curr['SMA200']:
-        signals.append({'ticker': ticker, 'signal': 'BUY', 'desc': 'Price crossed above SMA200'})
+        # Price crosses below SMA50 or SMA200 => Sell
+        if (prev["Close"] > prev["SMA50"] and curr["Close"] < curr["SMA50"]) or \
+           (prev["Close"] > prev["SMA200"] and curr["Close"] < curr["SMA200"]):
+            df.at[df.index[i], "Sell Signal"] = True
 
-    # Price crosses below SMA200 - SELL
-    if prev['Close'] > prev['SMA200'] and curr['Close'] < curr['SMA200']:
-        signals.append({'ticker': ticker, 'signal': 'SELL', 'desc': 'Price crossed below SMA200'})
+    return df
 
-    return signals
 
 
 def create_plot(df, ticker):

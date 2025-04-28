@@ -282,8 +282,8 @@ def charts():
     for ticker in tickers:
         df = get_one_year_daily_close_price(ticker)
         df = create_charts.calculate_sma(df)
-        df = create_charts.generate_signals(df)
-        charts.append(create_charts.create_plot(df, ticker))  # Store multiple charts
+        df = create_charts.generate_signals(df, ticker)
+        charts.append(create_charts.create_plot(df, ticker))
 
     return render_template("charts.html", charts=charts, tickers=", ".join(tickers))
 
