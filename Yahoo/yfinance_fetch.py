@@ -16,11 +16,12 @@ def fetch_stock_data(ticker):
     analyst_price_target = info.get("targetMeanPrice")
 
     # print(analyst_price_target, trailing_pe, forward_pe)
+    # print(info.get('quoteType', ''))
 
     if "ETF" in info.get("quoteType", "") or "MUTUALFUND" in info.get("quoteType", ""):  # Check if it's an ETF or Mutual Fund
         # holdings = stock.get_funds_data(ticker).equity_holdings
         sector_weightings = {}
-        unformatted_sector_weightings = stock.get_funds_data(ticker).sector_weightings
+        unformatted_sector_weightings = stock.get_funds_data().sector_weightings
         for sector, weight in unformatted_sector_weightings.items():
             sector = format_sector_name(sector)
             sector_weightings[sector] = weight

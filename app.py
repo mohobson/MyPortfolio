@@ -4,6 +4,7 @@ import create_charts
 from Yahoo.yfinance_fetch import fetch_stock_data
 from Yahoo.yfinance_fetch import get_one_year_daily_close_price
 from Schwab.api import schwab
+import time
 
 import pandas as pd
 # import matplotlib
@@ -198,8 +199,12 @@ def refresh_data():
     tickers = list(positions_dict.keys())
 
     stock_data = []
+    ticker_count = 0 # just tracking how many requests I'm sending to yahoo
     for ticker in tickers:
-        yahoo_dict = fetch_stock_data(ticker)[0] # gather info from yahoo api
+        ticker_count += 1
+        # print(ticker_count, ticker)
+        yahoo_dict = fetch_stock_data(ticker)[0] # gather info from yahoo api - been getting too many requests error
+        # time.sleep(1.5)
         stock_price = yahoo_dict[ticker]['stock_price']
         trailing_pe = yahoo_dict[ticker]['trailing_pe']
         forward_pe = yahoo_dict[ticker]['forward_pe']
