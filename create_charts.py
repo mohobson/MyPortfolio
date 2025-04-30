@@ -12,7 +12,7 @@ def calculate_sma(df, short_window=50, long_window=200):
 
 def generate_signals(df, ticker):
     # Make sure the dataframe has no missing values
-    df = df.dropna()
+    df = df.dropna().copy()
 
     # Create new columns initialized to False
     df["Buy Signal"] = False
@@ -70,6 +70,6 @@ def create_plot(df, ticker):
         marker=dict(symbol="triangle-down", color="red", size=10)
     ))
 
-    fig.update_layout(title=f"{ticker} - SMA Breakouts", xaxis_title="Date", yaxis_title="Price", template="plotly_white")
+    fig.update_layout(title=f"{ticker}", xaxis_title="Date", yaxis_title="Price", template="plotly_white")
     
     return pio.to_html(fig, full_html=False)

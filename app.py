@@ -5,6 +5,7 @@ from Yahoo.yfinance_fetch import fetch_stock_data
 from Yahoo.yfinance_fetch import get_one_year_daily_close_price
 from Schwab.api import schwab
 import time
+from datetime import datetime, timedelta, timezone
 
 import pandas as pd
 # import matplotlib
@@ -280,17 +281,40 @@ def refresh_data():
 def charts():
     tickers = db.fetch_all_data()["Ticker"].tolist()
     charts = []
-    
+    signal_filter = "all"
     if request.method == "POST":
-        tickers = request.form["tickers"].upper().replace(" ", "").split(",")  # User input: "AAPL, TSLA, AMZN"
-    
+        form_type = request.form.get("form_type")
+
+        if form_type == "search":
+            tickers_input = request.form["tickers"].upper().replace(" ", "")
+            tickers = tickers_input.split(",") if tickers_input else tickers
+
+        elif form_type == "filter":
+            signal_filter = request.form.get("signal_filter", "all")
+
+    days_lookback = 5
+    cutoff_date = datetime.now(timezone.utc) - timedelta(days=days_lookback) # LOOK AT CHANGING FROM UTC TO EST
+
+
     for ticker in tickers:
         df = get_one_year_daily_close_price(ticker)
         df = create_charts.calculate_sma(df)
         df = create_charts.generate_signals(df, ticker)
-        charts.append(create_charts.create_plot(df, ticker))
 
-    return render_template("charts.html", charts=charts, tickers=", ".join(tickers))
+        recent_signals = df.loc[cutoff_date:]
+
+        show_chart = False
+        if signal_filter == "buy" and recent_signals["Buy Signal"].any():
+            show_chart = True
+        elif signal_filter == "sell" and recent_signals["Sell Signal"].any():
+            show_chart = True
+        elif signal_filter == "all":
+            show_chart = True
+
+        if show_chart:
+            charts.append(create_charts.create_plot(df, ticker))
+
+    return render_template("charts.html", charts=charts)
 
 
 if __name__ == "__main__":

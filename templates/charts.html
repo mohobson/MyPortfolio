@@ -4,14 +4,30 @@
 
 <h1>SMA Breakout Tracker</h1>
 
-<div class="header-links">
-    <a class="header-links" href="{{ url_for('dashboard') }}">Home</a>
-</div>
+<div class="charts-header">
+    <div class="header-links">
+        <a class="header-links" href="{{ url_for('dashboard') }}">Home</a>
+    </div>
 
-<form method="POST">
-    <input type="text" name="tickers" placeholder="Enter tickers (e.g., AAPL, TSLA, AMZN)" required>
-    <button type="submit">Get Charts</button>
-</form>
+    <div class="chart-filters">
+        <form method="POST" class="edit-form">
+            <input type="hidden" name="form_type" value="search">
+            <input type="text" name="tickers" placeholder="Enter tickers (e.g., AAPL, TSLA, AMZN)">
+            <button type="submit" class="edit-button">Get Charts</button>
+        </form>
+        
+        <form method="POST">
+            <input type="hidden" name="form_type" value="filter">
+            <label>Filter by signal:</label>
+            <select name="signal_filter">
+                <option value="all">All</option>
+                <option value="buy">Buy</option>
+                <option value="sell">Sell</option>
+            </select>
+            <button type="submit" class="edit-button">Apply Filter</button>
+        </form>
+    </div>
+</div>
 
 {% for chart in charts %}
     <div class="chart-container">{{ chart | safe }}</div>

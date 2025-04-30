@@ -48,6 +48,13 @@ body {
     align-content: flex-start;
 }
 
+.charts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
 .sector-legend-box {
     width: 120px;
     min-width: 120px;
@@ -267,4 +274,11 @@ ul {
 /* Default styling for sectors not explicitly defined */
 .default-sector {
     background-color: #708090; /* Slate Gray */
+}
+
+.chart-filters {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin-bottom: 20px;
 }
