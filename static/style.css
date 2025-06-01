@@ -282,3 +282,19 @@ ul {
     gap: 10px;
     margin-bottom: 20px;
 }
+
+/* Table container styles */
+.table-container {
+    max-height: calc(100vh - 150px);  /* Adjust based on your header height */
+    overflow-y: auto;
+    margin-top: 20px;
+}
+
+/* Sticky header styles */
+table thead tr th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: #f4f4f4;  /* Same as existing header background */
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);  /* Add shadow for visual separation */
+}
