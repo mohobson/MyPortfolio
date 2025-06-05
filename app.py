@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, send_file
 from database import Database
 import create_charts
 from Yahoo.yfinance_fetch import fetch_stock_data
@@ -6,6 +6,8 @@ from Yahoo.yfinance_fetch import get_one_year_daily_close_price
 from Schwab.api import schwab
 import time
 from datetime import datetime, timedelta, timezone
+import io
+import csv
 
 import pandas as pd
 # import matplotlib
@@ -316,6 +318,51 @@ def charts():
 
     return render_template("charts.html", charts=charts)
 
+@app.route("/download_portfolio")
+def download_portfolio():
+    # Fetch all data from the database
+    portfolio_data = db.fetch_all_data()
+    
+    # Create a string buffer to write the CSV data
+    si = io.StringIO()
+    cw = csv.writer(si)
+    
+    # Write headers
+    cw.writerow(['Ticker', 'Shares', 'Stock Price', 'Market Value', 'Profit/Loss', 
+                 '% of Portfolio', 'Trailing PE', 'Forward PE', 'Analyst Rating', 
+                 'Analyst Price Target', 'Price Target', 'Notes'])
+    
+    # Write data rows
+    for _, row in portfolio_data.iterrows():
+        cw.writerow([
+            row['Ticker'],
+            row['Shares'],
+            row['Stock_Price'],
+            row['Market_Value'],
+            row['Profit_Loss'],
+            f"{row['Percent_of_Portfolio']:.2f}" if pd.notnull(row['Percent_of_Portfolio']) else "0.00",
+            row['Trailing_PE'],
+            row['Forward_PE'],
+            row['Analyst_Rating'],
+            row['Analyst_Price_Target'],
+            row['Price_Target'],
+            row['Notes']
+        ])
+    
+    # Get the string value and encode it
+    output = si.getvalue().encode('utf-8')
+    si.close()
+    
+    # Create a BytesIO buffer for the response
+    output_buffer = io.BytesIO(output)
+    
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    return send_file(
+        output_buffer,
+        mimetype='text/csv',
+        as_attachment=True,
+        download_name=f'portfolio_data_{timestamp}.csv'
+    )
 
 if __name__ == "__main__":
     app.run(debug=True)
