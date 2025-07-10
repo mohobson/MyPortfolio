@@ -297,13 +297,16 @@ def charts():
     days_lookback = 5
     cutoff_date = datetime.now(timezone.utc) - timedelta(days=days_lookback) # LOOK AT CHANGING FROM UTC TO EST
 
-
     for ticker in tickers:
         df = get_one_year_daily_close_price(ticker)
         df = create_charts.calculate_sma(df)
-        df = create_charts.generate_signals(df, ticker)
+        df_signals = create_charts.generate_signals(df.copy(), ticker)  # Only for signals
+        
+        # Reindex signals to match main DataFrame and fill NaN with False
+        df['Buy Signal'] = df_signals.reindex(df.index)['Buy Signal'].fillna(False)
+        df['Sell Signal'] = df_signals.reindex(df.index)['Sell Signal'].fillna(False)
 
-        recent_signals = df.loc[cutoff_date:]
+        recent_signals = df_signals.loc[cutoff_date:]
 
         show_chart = False
         if signal_filter == "buy" and recent_signals["Buy Signal"].any():
