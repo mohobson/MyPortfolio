@@ -156,9 +156,10 @@ def sector_breakdown():
 
     YTD_sector_performance_list = ['XLK', 'XLF', 'XLC', 'XLI', 'XLY', 'XLP', 'XLV', 'XLU', 'XLRE', 'XLE', 'XLB']
     YTD_sector_performance = get_YTD_sector_performance(YTD_sector_performance_list)
-    print("YTD_sector_performance", YTD_sector_performance)
+    sorted_YTD_sector_performance = dict(sorted(YTD_sector_performance.items(), key=lambda item: item[1], reverse=True))
+    print("YTD_sector_performance", sorted_YTD_sector_performance)
 
-    return render_template('sectors.html', sectors=sorted_sectors, abbreviations=abbreviations, YTD_sector_performance=YTD_sector_performance)
+    return render_template('sectors.html', sectors=sorted_sectors, abbreviations=abbreviations, YTD_sector_performance=sorted_YTD_sector_performance)
 
 
 
