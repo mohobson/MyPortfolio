@@ -1,4 +1,5 @@
 import yfinance as yf
+import datetime
 # documentation: https://ranaroussi.github.io/yfinance/reference/index.html
 
 def fetch_stock_data(ticker):
@@ -79,5 +80,22 @@ def get_one_year_daily_close_price(ticker, period="1y"):
     stock = yf.Ticker(ticker)
     df = stock.history(period=period)
     return df[['Close']]
+
+def get_YTD_sector_performance(ticker_list):
+    """Fetch YTD sector performance for a list of tickers."""
+    YTD_sector_performance = {}
+    today = datetime.datetime.now()
+    start_of_year = datetime.datetime(today.year, 1, 1)
+    for ticker in ticker_list:
+        stock = yf.Ticker(ticker)
+        hist = stock.history(start=start_of_year, end=today)
+        if hist.empty:
+            raise ValueError(f"No data found for {ticker} in {today.year}")
+
+        first_close = hist['Close'].iloc[0]
+        last_close = hist['Close'].iloc[-1]
+        ytd_return = ((last_close - first_close) / first_close) * 100
+        YTD_sector_performance[ticker] = round(ytd_return, 2)
+    return YTD_sector_performance
 
 # fetch_stock_data('SPY')

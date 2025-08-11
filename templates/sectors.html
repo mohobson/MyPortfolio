@@ -8,15 +8,23 @@
     <a class="header-links" href="{{ url_for('sector_breakdown') }} " target="_blank" rel="noopener noreferrer">Sector Breakdown</a>
     <a class="header-links" href="{{ url_for('charts') }}" target="_blank" rel="noopener noreferrer">Charts</a>
     <a class="header-links" href="{{ url_for('screener') }}" target="_blank" rel="noopener noreferrer">Screener</a>
-    <a class="header-links" href="https://www.sectorspdrs.com/sectortracker">S&P 500 Sector Performance</a>
+    <a class="header-links" href="https://www.sectorspdrs.com/sectortracker" target="_blank" rel="noopener nonreferrer">S&P 500 Sector Performance</a>
 </div>
 
 <iframe src="{{ url_for('static', filename='sector_allocation.html') }}" width="100%" height="600px" frameborder="0"></iframe>
 
 <div class="sectors-container">
     <div class="all-sectors">
-        <a href="https://novelinvestor.com/sector-performance/"><img src="https://149347908.v2.pressablecdn.com/wp-content/uploads/2025/01/novelinvestor-sector-returns-FY-2024.png" alt="Novel Investor Sector Returns Quilt"/></a>
+        <a href="https://novelinvestor.com/sector-performance/"><img src="https://novelinvestor.com/wp-content/uploads/2025/07/ni-sector-returns-Q2-2025.png" alt="Novel Investor Sector Returns Quilt"/></a>
         <small>Source: <a href="https://novelinvestor.com/">novelinvestor.com</a></small>
+    </div>
+    <div class="YTD-sector-performance">
+    {% for sector, performance in YTD_sector_performance.items() %}
+        <ul class="sector-box {{ sector.lower().replace(' ', '-') }}">
+            <li><strong>{{ sector }}</strong></li>
+            <li>{{ performance }}%</li>
+        </ul>
+    {% endfor %}
     </div>
     <div class="my-sectors">
     {% for sector, percentage in sectors.items() %}

@@ -1,8 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, send_file
 from database import Database
 import create_charts
-from Yahoo.yfinance_fetch import fetch_stock_data
-from Yahoo.yfinance_fetch import get_one_year_daily_close_price
+from Yahoo.yfinance_fetch import fetch_stock_data, get_one_year_daily_close_price, get_YTD_sector_performance
 from Schwab.api import schwab
 import time
 from datetime import datetime, timedelta, timezone
@@ -94,17 +93,17 @@ def sector_breakdown():
     sorted_sectors = dict(sorted(total_sector_allocation.items(), key=lambda item: item[1], reverse=True))
 
     sector_dictionary = {
-        'Technology': 'INFT',
-        'Financial Services': 'FINL',
-        'Communication Services': 'TELS',
-        'Industrials': 'INDU',
-        'Consumer Cyclical': 'COND',
-        'Consumer Defensive': 'CONS',
-        'Healthcare': 'HLTH',
-        'Utilities': 'UTIL',
-        'Real Estate': 'REAL',
-        'Energy': 'ENRS',
-        'Basic Materials': 'MATR',
+        'Technology': 'INFT (XLK)',
+        'Financial Services': 'FINL (XLF)',
+        'Communication Services': 'TELS (XLC)',
+        'Industrials': 'INDU (XLI)',
+        'Consumer Cyclical': 'COND (XLY)',
+        'Consumer Defensive': 'CONS (XLP)',
+        'Healthcare': 'HLTH (XLV)',
+        'Utilities': 'UTIL (XLU)',
+        'Real Estate': 'REAL (XLRE)',
+        'Energy': 'ENRS (XLE)',
+        'Basic Materials': 'MATR (XLB)',
     }
 
     # Abbreviation mapping
@@ -155,7 +154,11 @@ def sector_breakdown():
     # Save as an HTML file
     fig.write_html("static/sector_allocation.html")
 
-    return render_template('sectors.html', sectors=sorted_sectors, abbreviations=abbreviations)
+    YTD_sector_performance_list = ['XLK', 'XLF', 'XLC', 'XLI', 'XLY', 'XLP', 'XLV', 'XLU', 'XLRE', 'XLE', 'XLB']
+    YTD_sector_performance = get_YTD_sector_performance(YTD_sector_performance_list)
+    print("YTD_sector_performance", YTD_sector_performance)
+
+    return render_template('sectors.html', sectors=sorted_sectors, abbreviations=abbreviations, YTD_sector_performance=YTD_sector_performance)
 
 
 
